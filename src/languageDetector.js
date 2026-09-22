@@ -156,6 +156,22 @@ function detectByScript(text) {
   };
 }
 
+// Common short English words/acknowledgments seen in call transcripts. Used
+// only as a fallback for short, pure-Latin-alphabet text that would
+// otherwise be discarded as 'und' below FRANC_MIN_RELIABLE_LENGTH. This
+// matters specifically for language-switch calls: a speaker's short English
+// confirmations ("yes sir", "ok thank you") would otherwise be silently
+// excluded from the per-speaker majority vote, which can leave an earlier
+// minority language incorrectly "winning" even after the conversation has
+// actually moved to English.
+const commonEnglishWords = new Set([
+  'yes', 'no', 'ok', 'okay', 'sure', 'fine', 'good', 'thank', 'thanks', 'you',
+  'sir', 'maam', 'maam', 'please', 'hello', 'hi', 'bye', 'morning', 'afternoon',
+  'evening', 'speaking', 'calling', 'call', 'from', 'is', 'the', 'and', 'not',
+  'can', 'will', 'i', 'we', 'comfortable', 'english', 'understand', 'right',
+  'correct', 'done', 'problem', 'issue', 'wait', 'hold', 'line'
+]);
+
 /**
  * Detect language from text
  * @param {string} text - The text to analyze
@@ -172,9 +188,22 @@ function detectLanguage(text) {
     return scriptResult;
   }
 
-  // Below franc's reliable-length threshold, don't return a confident-looking
-  // wrong guess — return unknown instead.
-  if (text.trim().length < FRANC_MIN_RELIABLE_LENGTH) {
+  const trimmed = text.trim();
+
+  // Below franc's reliable-length threshold: instead of defaulting straight
+  // to 'und' (which drops this utterance from majority-language voting),
+  // check whether it's short, pure-Latin-alphabet text containing a common
+  // English word. If so, count it as English at reduced confidence rather
+  // than losing the signal entirely. Anything that doesn't match still
+  // returns 'und' as before.
+  if (trimmed.length < FRANC_MIN_RELIABLE_LENGTH) {
+    const isPureLatin = /^[a-zA-Z0-9\s.,!?'"-]+$/.test(trimmed);
+    if (isPureLatin) {
+      const words = trimmed.toLowerCase().split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
+      if (words.some(w => commonEnglishWords.has(w))) {
+        return { code: 'en', name: 'English', confidence: 0.6, method: 'short_latin_heuristic' };
+      }
+    }
     return { code: 'und', name: 'Unknown', confidence: 0, method: 'too_short' };
   }
 
@@ -387,8 +416,14 @@ function analyzeTranscript(transcript) {
       detected: perUtterance[i]
     }));
 
-    // Dominant language: most common non-'und' code across this speaker's
-    // utterances, falling back to whole-blob detection if all are 'und'.
+    // Dominant language: proportion of this speaker's utterances detected in
+    // each language — plain majority vote, no weighting by position or
+    // character length. If a speaker's utterances split e.g. 20% Tamil / 80%
+    // English, English wins and confidence reports as 0.8. This was tried
+    // with length-weighting and position-weighting first; both were dropped
+    // because they added bias (script verbosity, recency) the goal doesn't
+    // call for — the goal is just: which language did each speaker use for
+    // most of their turns, and do the two speakers' majorities match.
     const codeCounts = {};
     perUtterance.forEach(d => {
       if (d.code !== 'und') {
@@ -399,10 +434,11 @@ function analyzeTranscript(transcript) {
     const ranked = Object.entries(codeCounts).sort((a, b) => b[1] - a[1]);
     if (ranked.length > 0) {
       const [dominantCode] = ranked[0];
+      const totalCount = ranked.reduce((sum, [, c]) => sum + c, 0);
       speakerLanguages[speaker] = {
         code: dominantCode,
         name: dominantCode === 'und' ? 'Unknown' : (ISO6391.getName(dominantCode) || dominantCode),
-        confidence: ranked[0][1] / perUtterance.length,
+        confidence: Math.round((ranked[0][1] / totalCount) * 100) / 100,
         method: 'per_utterance_majority',
         switchesLanguage: ranked.length > 1
       };
