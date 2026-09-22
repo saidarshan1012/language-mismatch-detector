@@ -1,0 +1,4 @@
+Agent: Hello, this is Priya from GUVI. How can I help you today?
+Customer: Vanakkam, enakku ungal course pathri therindhukkanum.
+Agent: I apologize, but I don't speak Tamil. Let me transfer you.
+Customer: Sari, nandri.

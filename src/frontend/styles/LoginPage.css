@@ -1,0 +1,144 @@
+/* Login Page Styles */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-header h1 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 10px;
+}
+
+.login-header .subtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.coordinators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.coordinator-card {
+  background: linear-gradient(135deg, #f8f7ff 0%, #fff 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.coordinator-card:hover {
+  transform: translateY(-5px);
+  border-color: #667eea;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+.coordinator-card .avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 auto 15px;
+}
+
+.coordinator-card h3 {
+  color: #1f2937;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+}
+
+.coordinator-card .department {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.coordinator-card .languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.coordinator-card .language-tag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: #ede9fe;
+  color: #5b21b6;
+  border-radius: 12px;
+}
+
+.coordinator-card .unavailable-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.login-footer {
+  margin-top: 30px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-card.error {
+  text-align: center;
+  color: #dc2626;
+}
+
+.retry-btn {
+  margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+  .login-card {
+    padding: 25px;
+  }
+  
+  .login-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .coordinators-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .coordinators-grid {
+    grid-template-columns: 1fr;
+  }
+}
