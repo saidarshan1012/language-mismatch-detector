@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import '../styles/DashboardPage.css';
+import { PhoneIcon } from '../components/PhoneIcon';
 
 function DashboardPage({ user }) {
   const [leads, setLeads] = useState([]);
@@ -113,7 +114,7 @@ function DashboardPage({ user }) {
                 </span>
               </div>
               <div className="lead-info">
-                <p>📞 {lead.phone || 'No phone'}</p>
+                <p><PhoneIcon/> {lead.phone || 'No phone'}</p>
                 <p>✉️ {lead.email || 'No email'}</p>
               </div>
               {lead.callTranscriptions && lead.callTranscriptions.length > 0 && (

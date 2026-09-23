@@ -5,7 +5,7 @@ function Header({ user, onLogout }) {
   return (
     <header className="app-header">
       <div className="header-left">
-        <h1 className="logo">📞 GUVI BDC</h1>
+        <h1 className="logo">GUVI BDC</h1>
       </div>
       
       <nav className="header-nav">

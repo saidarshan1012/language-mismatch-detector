@@ -7,6 +7,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const connectDB = require('./db.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,10 +59,10 @@ function getFreshAnalyzer() {
 /**
  * GET /api/coordinators - Get all coordinators
  */
-app.get('/api/coordinators', (req, res) => {
+app.get('/api/coordinators', async (req, res) => {
   try {
     const { getAllCoordinators } = require('./coordinatorDB.js');
-    const coordinators = getAllCoordinators();
+    const coordinators = await getAllCoordinators();
     res.json(coordinators);
   } catch (error) {
     console.error('Error fetching coordinators:', error);
@@ -72,10 +73,10 @@ app.get('/api/coordinators', (req, res) => {
 /**
  * GET /api/coordinators/:id - Get coordinator by ID
  */
-app.get('/api/coordinators/:id', (req, res) => {
+app.get('/api/coordinators/:id', async (req, res) => {
   try {
     const { getCoordinatorById } = require('./coordinatorDB.js');
-    const coordinator = getCoordinatorById(req.params.id);
+    const coordinator = await getCoordinatorById(req.params.id);
     if (!coordinator) {
       return res.status(404).json({ error: 'Coordinator not found' });
     }
@@ -89,10 +90,10 @@ app.get('/api/coordinators/:id', (req, res) => {
 /**
  * POST /api/coordinators - Add new coordinator
  */
-app.post('/api/coordinators', (req, res) => {
+app.post('/api/coordinators', async (req, res) => {
   try {
     const { addCoordinator } = require('./coordinatorDB.js');
-    const coordinator = addCoordinator(req.body);
+    const coordinator = await addCoordinator(req.body);
     res.status(201).json(coordinator);
   } catch (error) {
     console.error('Error adding coordinator:', error);
@@ -103,10 +104,10 @@ app.post('/api/coordinators', (req, res) => {
 /**
  * PUT /api/coordinators/:id - Update coordinator
  */
-app.put('/api/coordinators/:id', (req, res) => {
+app.put('/api/coordinators/:id', async (req, res) => {
   try {
     const { updateCoordinator } = require('./coordinatorDB.js');
-    const coordinator = updateCoordinator(req.params.id, req.body);
+    const coordinator = await updateCoordinator(req.params.id, req.body);
     if (!coordinator) {
       return res.status(404).json({ error: 'Coordinator not found' });
     }
@@ -120,10 +121,10 @@ app.put('/api/coordinators/:id', (req, res) => {
 /**
  * DELETE /api/coordinators/:id - Delete coordinator
  */
-app.delete('/api/coordinators/:id', (req, res) => {
+app.delete('/api/coordinators/:id', async (req, res) => {
   try {
     const { deleteCoordinator } = require('./coordinatorDB.js');
-    const success = deleteCoordinator(req.params.id);
+    const success = await deleteCoordinator(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'Coordinator not found' });
     }
@@ -139,14 +140,14 @@ app.delete('/api/coordinators/:id', (req, res) => {
 /**
  * GET /api/leads - Get all leads or leads for a coordinator
  */
-app.get('/api/leads', (req, res) => {
+app.get('/api/leads', async (req, res) => {
   try {
     const { getAllLeads, getLeadsByCoordinator } = require('./coordinatorDB.js');
     const coordinatorId = req.query.coordinatorId;
     
     const leads = coordinatorId 
-      ? getLeadsByCoordinator(coordinatorId)
-      : getAllLeads();
+      ? await getLeadsByCoordinator(coordinatorId)
+      : await getAllLeads();
     
     res.json(leads);
   } catch (error) {
@@ -158,10 +159,10 @@ app.get('/api/leads', (req, res) => {
 /**
  * GET /api/leads/:id - Get lead by ID
  */
-app.get('/api/leads/:id', (req, res) => {
+app.get('/api/leads/:id', async (req, res) => {
   try {
     const { getLeadById } = require('./coordinatorDB.js');
-    const lead = getLeadById(req.params.id);
+    const lead = await getLeadById(req.params.id);
     if (!lead) {
       return res.status(404).json({ error: 'Lead not found' });
     }
@@ -175,10 +176,10 @@ app.get('/api/leads/:id', (req, res) => {
 /**
  * POST /api/leads - Create new lead
  */
-app.post('/api/leads', (req, res) => {
+app.post('/api/leads', async (req, res) => {
   try {
     const { createLead } = require('./coordinatorDB.js');
-    const lead = createLead(req.body);
+    const lead = await createLead(req.body);
     res.status(201).json(lead);
   } catch (error) {
     console.error('Error creating lead:', error);
@@ -189,10 +190,10 @@ app.post('/api/leads', (req, res) => {
 /**
  * PUT /api/leads/:id/status - Update lead status
  */
-app.put('/api/leads/:id/status', (req, res) => {
+app.put('/api/leads/:id/status', async (req, res) => {
   try {
     const { updateLeadStatus } = require('./coordinatorDB.js');
-    const lead = updateLeadStatus(req.params.id, req.body.status);
+    const lead = await updateLeadStatus(req.params.id, req.body.status);
     if (!lead) {
       return res.status(404).json({ error: 'Lead not found' });
     }
@@ -238,7 +239,7 @@ app.post('/api/analyze', upload.single('transcript'), (req, res) => {
 /**
  * POST /api/leads/:id/transcription - Upload transcription and transfer lead if needed
  */
-app.post('/api/leads/:id/transcription', upload.single('transcript'), (req, res) => {
+app.post('/api/leads/:id/transcription', upload.single('transcript'), async (req, res) => {
   try {
     let transcriptText = '';
 
@@ -257,8 +258,7 @@ app.post('/api/leads/:id/transcription', upload.single('transcript'), (req, res)
 
     // Analyze the transcript
     const { analyzeCallTranscript } = getFreshAnalyzer();
-    const analysisResult = analyzeCallTranscript(transcriptText);
-    
+    const analysisResult = await analyzeCallTranscript(transcriptText);    
     // Import transfer function
     const { transferLead } = require('./coordinatorDB.js');
     
@@ -272,7 +272,7 @@ app.post('/api/leads/:id/transcription', upload.single('transcript'), (req, res)
       if (customerEntry) {
         const customerLanguage = analysisResult.speakers[customerEntry[0]]?.code;
         if (customerLanguage) {
-          transferResult = transferLead(req.params.id, customerLanguage, analysisResult);
+          transferResult = await transferLead(req.params.id, customerLanguage, analysisResult);
         }
       }
     }
@@ -292,10 +292,10 @@ app.post('/api/leads/:id/transcription', upload.single('transcript'), (req, res)
 /**
  * GET /api/pending-transfers - Get all pending transfers
  */
-app.get('/api/pending-transfers', (req, res) => {
+app.get('/api/pending-transfers', async (req, res) => {
   try {
     const { getPendingTransfers } = require('./coordinatorDB.js');
-    const pending = getPendingTransfers();
+    const pending = await getPendingTransfers();
     res.json(pending);
   } catch (error) {
     console.error('Error fetching pending transfers:', error);
@@ -327,7 +327,8 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+connectDB().then(() => {
+  app.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║   Business Development Coordinator Management System            ║
@@ -356,4 +357,5 @@ API Endpoints:
   Pending Transfers:
     GET    /api/pending-transfers   - List pending transfers
 `);
+  });
 });

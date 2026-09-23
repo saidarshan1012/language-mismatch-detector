@@ -1,0 +1,206 @@
+/* ==========================================================================
+   Design tokens — GUVI Business Development System
+   Palette: white surface, near-black text, blue primary, green accent.
+   Import this file first in every page stylesheet:
+     @import './variables.css';
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root {
+  /* Surfaces */
+  --color-bg: #ffffff;
+  --color-surface: #f6f8fa;
+  --color-surface-hover: #eef2f5;
+  --color-border: #e2e8ed;
+  --color-border-strong: #cbd5dd;
+
+  /* Text */
+  --color-text: #12181f;
+  --color-text-secondary: #5b6b79;
+  --color-text-muted: #8a97a3;
+  --color-text-on-primary: #ffffff;
+
+  /* Primary — blue */
+  --color-primary: rgb(4, 96, 166);
+  --color-primary-hover: #034d86;
+  --color-primary-soft: #e8f1f8;
+  --color-primary-border: #bfdaef;
+
+  /* Accent — green (used sparingly: success / available / positive states) */
+  --color-accent: #0ad652;
+  --color-accent-dark: #089c3d;
+  --color-accent-soft: #e3fbec;
+  --color-accent-border: #a9edc2;
+
+  /* Semantic */
+  --color-danger: #cf3d3d;
+  --color-danger-soft: #fbeaea;
+  --color-danger-border: #f1bcbc;
+  --color-warning: #b8760f;
+  --color-warning-soft: #fdf1e0;
+  --color-warning-border: #f0d29c;
+  --color-info: var(--color-primary);
+  --color-info-soft: var(--color-primary-soft);
+
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+
+  /* Spacing (8px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* Elevation — kept minimal; borders do most of the work */
+  --shadow-sm: 0 1px 2px rgba(18, 24, 31, 0.06);
+  --shadow-md: 0 4px 16px rgba(18, 24, 31, 0.08);
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration: 160ms;
+}
+
+/* ==========================================================================
+   Shared primitives — safe to reuse across every page
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease), transform var(--duration) var(--ease);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn-primary { 
+  background: var(--color-accent);   /* green */
+  color: var(--color-text-on-primary);
+}
+
+/* .btn-primary:hover {
+  background: var(--color-primary-hover);
+} */
+
+.btn-primary:disabled {
+  background: var(--color-border-strong);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  border-color: var(--color-primary-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-soft);
+}
+
+.btn-cancel {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.btn-cancel:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.btn.full-width {
+  width: 100%;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary-soft);
+  border-top-color: var(--color-primary);
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto var(--space-4);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: var(--space-4);
+  border: 1px solid transparent;
+}
+
+.alert button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.alert button:hover {
+  opacity: 1;
+}
+
+.alert-error {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.alert-success {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border);
+  color: var(--color-accent-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

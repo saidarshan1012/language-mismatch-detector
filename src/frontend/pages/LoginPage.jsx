@@ -82,7 +82,7 @@ function LoginPage({ onLogin }) {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>📞 Business Development</h1>
+          <h1> Business Development</h1>
           <p className="subtitle">Select your profile to continue</p>
         </div>
         

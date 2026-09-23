@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import '../styles/LeadDetailPage.css';
+import { PhoneIcon } from '../components/PhoneIcon';
 
 function LeadDetailPage({ user }) {
   const { id } = useParams();
@@ -137,7 +138,7 @@ Agent: I understand. Let me help you with that.`);
             )}
           </div>
           <div className="contact-info">
-            <p>📞 {lead.phone || 'No phone number'}</p>
+            <p><PhoneIcon /> {lead.phone || 'No phone number'}</p>
             <p>✉️ {lead.email || 'No email'}</p>
           </div>
         </div>

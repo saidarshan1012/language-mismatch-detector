@@ -16,7 +16,7 @@ const { findCoordinatorsByLanguages, getAllCoordinators } = require('./coordinat
  * @param {Object} options - Analysis options
  * @returns {Object} - Complete analysis result
  */
-function analyzeCallTranscript(transcript, options = {}) {
+async function analyzeCallTranscript(transcript, options = {}) {
   // Analyze the transcript for language mismatch
   const languageAnalysis = analyzeTranscript(transcript);
 
@@ -55,22 +55,20 @@ function analyzeCallTranscript(transcript, options = {}) {
 
   if (languageAnalysis.hasLanguageMismatch) {
     const targetLanguages = languageAnalysis.languages;
-    matchingCoordinators = findCoordinatorsByLanguages(targetLanguages, {
+    matchingCoordinators = await findCoordinatorsByLanguages(targetLanguages, {
       matchAny: true,
       availableOnly: options.availableOnly ?? true,
       department: options.department
     });
 
-    // Filter coordinators to find best matches (those who speak ALL detected languages)
-    const bestMatches = findCoordinatorsByLanguages(targetLanguages, {
+    const bestMatches = await findCoordinatorsByLanguages(targetLanguages, {
       matchAny: false,
       availableOnly: options.availableOnly ?? true,
       department: options.department
     });
 
-    // Tag best matches
     matchingCoordinators = matchingCoordinators.map(c => ({
-      ...c,
+      ...c.toObject(),
       isBestMatch: bestMatches.some(b => b.id === c.id)
     }));
   }
